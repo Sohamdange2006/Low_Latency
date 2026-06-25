@@ -2,7 +2,7 @@
 #include <algorithm>   // std::min
 #include <limits>
 
-// ---- the hot path: match an incoming order against the opposite book ----
+// the hot path: match an incoming order against the opposite book
 //
 // `cross` is the book we eat into (asks if we're buying, bids if selling).
 // `rest`  is the book the leftover sits in (our own side).
@@ -16,7 +16,7 @@ void OrderBook::match(Order o, CrossBook& cross, RestBook& rest,
 
     while (o.qty > 0 && !cross.empty()) {
         auto best = cross.begin();          // best price level on the far side
-        uint32_t rp = best->first;          // <-- chase #1: walk into RB-tree
+        uint32_t rp = best->first;          // chase #1: walk into RB-tree
 
         uint32_t bid_px = buy ? o.price : rp;
         uint32_t ask_px = buy ? rp : o.price;
@@ -24,7 +24,7 @@ void OrderBook::match(Order o, CrossBook& cross, RestBook& rest,
 
         auto& q = best->second.fifo;        // FIFO at this price (time priority)
         while (o.qty > 0 && !q.empty()) {
-            Order& maker = q.front();       // <-- chase #2: load the list node
+            Order& maker = q.front();       //  chase #2: load the list node
             uint32_t fill = std::min(o.qty, maker.qty);
 
             o.qty     -= fill;
@@ -33,11 +33,11 @@ void OrderBook::match(Order o, CrossBook& cross, RestBook& rest,
             volume_ += fill;
 
             if (maker.qty == 0) {           // resting order fully consumed
-                idx_.erase(maker.id);       // <-- chase #3: hash erase
-                q.pop_front();              // <-- chase #4: free + relink node
+                idx_.erase(maker.id);       //  chase #3: hash erase
+                q.pop_front();              // chase #4: free + relink node
             }
         }
-        if (q.empty()) cross.erase(best);   // <-- chase #5: RB-tree rebalance
+        if (q.empty()) cross.erase(best);   //  chase #5: RB-tree rebalance
     }
 
     // leftover limit qty rests; market leftover is thrown away

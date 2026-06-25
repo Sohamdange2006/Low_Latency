@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // --- LOAD PHASE (not timed) --------------------------------------------
+    // LOAD PHASE (not timed)
     // Pull the whole file into a vector first. Disk I/O and parsing have
     // nothing to do with matching speed, so we keep them out of the clock.
     std::ifstream in(argv[1]);
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     }
     std::cerr << "loaded " << rows.size() << " orders\n";
 
-    // --- MATCH PHASE (timed) -----------------------------------------------
+    //MATCH PHASE (timed)
     OrderBook book;
     auto t0 = std::chrono::steady_clock::now();
 
